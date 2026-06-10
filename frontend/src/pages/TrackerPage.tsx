@@ -20,7 +20,7 @@ import { CheckCircle2, Save, Target } from 'lucide-react';
 import { useSession } from '../hooks/useSession';
 import { useProgress } from '../hooks/useProgress';
 import type { CarbonResult } from '../types/carbon';
-import { TreeGrowth, getEcoLevel } from '../components/EcoIllustrations';
+import { getEcoLevel } from '../components/EcoIllustrations';
 
 export default function TrackerPage() {
   const sessionId = useSession();
