@@ -169,7 +169,7 @@ export default function DashboardPage() {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number | string | undefined) => [`${value} tonnes`, 'CO₂/year']}
+                formatter={((value: unknown) => [`${value} tonnes`, 'CO₂/year']) as never}
               />
             </PieChart>
           </ResponsiveContainer>
