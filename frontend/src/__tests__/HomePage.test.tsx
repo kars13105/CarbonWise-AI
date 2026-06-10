@@ -15,7 +15,7 @@ describe('HomePage', () => {
   it('renders the hero heading', () => {
     renderWithRouter(<HomePage />);
     expect(
-      screen.getByRole('heading', { name: /understand your/i })
+      screen.getByRole('heading', { name: /greener planet/i })
     ).toBeInTheDocument();
   });
 
@@ -30,16 +30,16 @@ describe('HomePage', () => {
   it('renders all feature cards', () => {
     renderWithRouter(<HomePage />);
     expect(screen.getByText('Carbon Calculator')).toBeInTheDocument();
-    expect(screen.getByText('Emission Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Visual Dashboard')).toBeInTheDocument();
     expect(screen.getByText('AI Sustainability Coach')).toBeInTheDocument();
     expect(screen.getByText('Scenario Simulator')).toBeInTheDocument();
     expect(screen.getByText('Progress Tracker')).toBeInTheDocument();
-    expect(screen.getByText('Sustainability Challenges')).toBeInTheDocument();
+    expect(screen.getByText(/Badges/i)).toBeInTheDocument();
   });
 
   it('renders how it works section', () => {
     renderWithRouter(<HomePage />);
-    expect(screen.getByText('How It Works')).toBeInTheDocument();
+    expect(screen.getByText(/How It Works/i)).toBeInTheDocument();
     expect(screen.getByText('Calculate')).toBeInTheDocument();
     expect(screen.getByText('Understand')).toBeInTheDocument();
     expect(screen.getByText('Improve')).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('HomePage', () => {
 
   it('has proper accessibility landmark', () => {
     renderWithRouter(<HomePage />);
-    const heroSection = screen.getByRole('heading', { name: /understand your/i });
+    const heroSection = screen.getByRole('heading', { name: /greener planet/i });
     expect(heroSection).toBeInTheDocument();
   });
 });
