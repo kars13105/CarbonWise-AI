@@ -3,7 +3,7 @@
  * Side-by-side Earth mascot reactions and pastel comparison charts.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BarChart,
@@ -51,25 +51,31 @@ function calculateLocalTotal(input: CarbonInput) {
 }
 
 export default function SimulatorPage() {
-  const [currentInput, setCurrentInput] = useState<CarbonInput | null>(null);
-  const [projected, setProjected] = useState<CarbonInput | null>(null);
-
-  useEffect(() => {
+  const [currentInput] = useState<CarbonInput | null>(() => {
+    const stored = sessionStorage.getItem('carbonInput');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch { /* ignore */ }
+    }
+    return null;
+  });
+  const [projected, setProjected] = useState<CarbonInput | null>(() => {
     const stored = sessionStorage.getItem('carbonInput');
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        setCurrentInput(parsed);
-        setProjected({
+        return {
           transport: { ...parsed.transport },
           electricity_kwh: parsed.electricity_kwh,
           flights: { ...parsed.flights },
           food_type: parsed.food_type,
           shopping_level: parsed.shopping_level,
-        });
+        };
       } catch { /* ignore */ }
     }
-  }, []);
+    return null;
+  });
 
   if (!currentInput || !projected) {
     return (

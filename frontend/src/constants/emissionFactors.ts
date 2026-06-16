@@ -70,3 +70,11 @@ export const GLOBAL_AVERAGES: Record<string, number> = {
 };
 
 export const MONTHS_PER_YEAR = 12;
+
+export function getEcoLevel(score: number): { level: number; name: string; emoji: string; nextAt: number } {
+  if (score >= 90) return { level: 5, name: 'Mighty Oak', emoji: '🌳', nextAt: 100 };
+  if (score >= 70) return { level: 4, name: 'Growing Tree', emoji: '🌲', nextAt: 90 };
+  if (score >= 50) return { level: 3, name: 'Young Sapling', emoji: '🌿', nextAt: 70 };
+  if (score >= 25) return { level: 2, name: 'Sprouting Seed', emoji: '🌱', nextAt: 50 };
+  return { level: 1, name: 'Seedling', emoji: '🫘', nextAt: 25 };
+}

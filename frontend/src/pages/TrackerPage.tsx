@@ -3,7 +3,7 @@
  * Timeline milestones, pastel charts, and forest-path goal visualization.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   XAxis,
@@ -20,24 +20,23 @@ import { CheckCircle2, Save, Target } from 'lucide-react';
 import { useSession } from '../hooks/useSession';
 import { useProgress } from '../hooks/useProgress';
 import type { CarbonResult } from '../types/carbon';
-import { getEcoLevel } from '../components/EcoIllustrations';
+import { getEcoLevel } from '../constants/emissionFactors';
 
 export default function TrackerPage() {
   const sessionId = useSession();
   const { progress, saveSnapshot, setGoal } = useProgress(sessionId);
-  const [result, setResult] = useState<CarbonResult | null>(null);
-  const [goalPercent, setGoalPercent] = useState(15);
-  const [saved, setSaved] = useState(false);
-  const [goalSaved, setGoalSaved] = useState(false);
-
-  useEffect(() => {
+  const [result] = useState<CarbonResult | null>(() => {
     const stored = sessionStorage.getItem('carbonResult');
     if (stored) {
       try {
-        setResult(JSON.parse(stored));
+        return JSON.parse(stored);
       } catch { /* ignore */ }
     }
-  }, []);
+    return null;
+  });
+  const [goalPercent, setGoalPercent] = useState(15);
+  const [saved, setSaved] = useState(false);
+  const [goalSaved, setGoalSaved] = useState(false);
 
   const handleSaveSnapshot = async () => {
     if (!result) return;

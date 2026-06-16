@@ -3,7 +3,7 @@
  * pastel charts, and gamified badges.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   PieChart,
   Pie,
@@ -17,26 +17,25 @@ import {
 } from 'recharts';
 import { Link } from 'react-router-dom';
 import type { CarbonResult } from '../types/carbon';
-import { CATEGORY_COLORS, CATEGORY_LABELS } from '../constants/emissionFactors';
+import { CATEGORY_COLORS, CATEGORY_LABELS, getEcoLevel } from '../constants/emissionFactors';
 import { useSession } from '../hooks/useSession';
 import { useProgress } from '../hooks/useProgress';
-import { TreeGrowth, EcoMascot, getEcoLevel, AnimatedCounter } from '../components/EcoIllustrations';
+import { TreeGrowth, EcoMascot, AnimatedCounter } from '../components/EcoIllustrations';
 
 export default function DashboardPage() {
-  const [result, setResult] = useState<CarbonResult | null>(null);
-  const sessionId = useSession();
-  const { badges } = useProgress(sessionId);
-
-  useEffect(() => {
+  const [result] = useState<CarbonResult | null>(() => {
     const stored = sessionStorage.getItem('carbonResult');
     if (stored) {
       try {
-        setResult(JSON.parse(stored));
+        return JSON.parse(stored);
       } catch {
-        // ignore parse errors
+        return null;
       }
     }
-  }, []);
+    return null;
+  });
+  const sessionId = useSession();
+  const { badges } = useProgress(sessionId);
 
   if (!result) {
     return (

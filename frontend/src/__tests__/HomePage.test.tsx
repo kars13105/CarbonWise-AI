@@ -34,7 +34,7 @@ describe('HomePage', () => {
     expect(screen.getByText('AI Sustainability Coach')).toBeInTheDocument();
     expect(screen.getByText('Scenario Simulator')).toBeInTheDocument();
     expect(screen.getByText('Progress Tracker')).toBeInTheDocument();
-    expect(screen.getByText(/Badges/i)).toBeInTheDocument();
+    expect(screen.getByText('Badges & Achievements')).toBeInTheDocument();
   });
 
   it('renders how it works section', () => {

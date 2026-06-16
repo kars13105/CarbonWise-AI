@@ -106,15 +106,20 @@ export function EcoMascot({
   );
 }
 
+function getPseudoRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
 /* ─── Floating Leaves ──────────────────────────────────────────────────────── */
 /** Animated falling leaves for decorative backgrounds */
 export function FloatingLeaves({ count = 6 }: { count?: number }) {
   const leaves = Array.from({ length: count }, (_, i) => ({
     id: i,
-    left: `${10 + (i * 80) / count + Math.random() * 10}%`,
-    delay: `${i * 1.5 + Math.random() * 2}s`,
-    duration: `${8 + Math.random() * 6}s`,
-    size: 12 + Math.random() * 10,
+    left: `${10 + (i * 80) / count + getPseudoRandom(i + 1) * 10}%`,
+    delay: `${i * 1.5 + getPseudoRandom(i + 2) * 2}s`,
+    duration: `${8 + getPseudoRandom(i + 3) * 6}s`,
+    size: 12 + getPseudoRandom(i + 4) * 10,
     color: ['#a8d8a8', '#82c080', '#6db06b', '#c8e6c8', '#73d4a0', '#4a7c59'][i % 6],
   }));
 
@@ -189,15 +194,7 @@ export function GrassDecoration({ color = '#e8f5e8', opacity = 0.5 }: { color?: 
   );
 }
 
-/* ─── Eco Level ────────────────────────────────────────────────────────────── */
-/** Returns the eco level info based on score */
-export function getEcoLevel(score: number): { level: number; name: string; emoji: string; nextAt: number } {
-  if (score >= 90) return { level: 5, name: 'Mighty Oak', emoji: '🌳', nextAt: 100 };
-  if (score >= 70) return { level: 4, name: 'Growing Tree', emoji: '🌲', nextAt: 90 };
-  if (score >= 50) return { level: 3, name: 'Young Sapling', emoji: '🌿', nextAt: 70 };
-  if (score >= 25) return { level: 2, name: 'Sprouting Seed', emoji: '🌱', nextAt: 50 };
-  return { level: 1, name: 'Seedling', emoji: '🫘', nextAt: 25 };
-}
+// (Eco Level helper has been moved to emissionFactors.ts to comply with fast refresh rules)
 
 /* ─── Animated Counter ─────────────────────────────────────────────────────── */
 /** Counts up from 0 to target with easing animation */

@@ -13,9 +13,9 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useCalculator } from '../hooks/useCalculator';
-import { TreeGrowth, EcoMascot, getEcoLevel, AnimatedCounter } from '../components/EcoIllustrations';
+import { TreeGrowth, EcoMascot, AnimatedCounter } from '../components/EcoIllustrations';
 import type { CarbonResult } from '../types/carbon';
-import { CATEGORY_COLORS, CATEGORY_LABELS } from '../constants/emissionFactors';
+import { CATEGORY_COLORS, CATEGORY_LABELS, getEcoLevel } from '../constants/emissionFactors';
 
 const STEPS = [
   { label: 'Transport', emoji: '🚗' },
@@ -142,8 +142,8 @@ export default function CalculatorPage() {
                         className="input"
                         min="0"
                         max="50000"
-                        value={input.transport[field.key] || ''}
-                        onChange={(e) => updateTransport({ [field.key]: Number(e.target.value) || 0 })}
+                        value={input.transport[field.key] === 0 ? 0 : input.transport[field.key] || ''}
+                        onChange={(e) => updateTransport({ [field.key]: e.target.value === '' ? 0 : Number(e.target.value) })}
                         placeholder="0"
                       />
                     </div>
@@ -163,8 +163,8 @@ export default function CalculatorPage() {
                     className="input"
                     min="0"
                     max="10000"
-                    value={input.electricity_kwh || ''}
-                    onChange={(e) => updateInput({ electricity_kwh: Number(e.target.value) || 0 })}
+                    value={input.electricity_kwh === 0 ? 0 : input.electricity_kwh || ''}
+                    onChange={(e) => updateInput({ electricity_kwh: e.target.value === '' ? 0 : Number(e.target.value) })}
                     placeholder="e.g., 300"
                   />
                   <p className="text-text-400 text-xs mt-2 font-semibold">
@@ -186,8 +186,8 @@ export default function CalculatorPage() {
                       className="input"
                       min="0"
                       max="100"
-                      value={input.flights.domestic || ''}
-                      onChange={(e) => updateFlights({ domestic: Number(e.target.value) || 0 })}
+                      value={input.flights.domestic === 0 ? 0 : input.flights.domestic || ''}
+                      onChange={(e) => updateFlights({ domestic: e.target.value === '' ? 0 : Number(e.target.value) })}
                       placeholder="0"
                     />
                   </div>
@@ -201,8 +201,8 @@ export default function CalculatorPage() {
                       className="input"
                       min="0"
                       max="100"
-                      value={input.flights.international || ''}
-                      onChange={(e) => updateFlights({ international: Number(e.target.value) || 0 })}
+                      value={input.flights.international === 0 ? 0 : input.flights.international || ''}
+                      onChange={(e) => updateFlights({ international: e.target.value === '' ? 0 : Number(e.target.value) })}
                       placeholder="0"
                     />
                   </div>

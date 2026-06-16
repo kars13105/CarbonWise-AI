@@ -46,6 +46,16 @@ vi.mock('recharts', () => ({
   Legend: () => null,
 }));
 
+vi.mock('../components/EcoIllustrations', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../components/EcoIllustrations')>();
+  return {
+    ...actual,
+    AnimatedCounter: ({ target, suffix = '' }: { target: number; suffix?: string }) => (
+      <span>{target}{suffix}</span>
+    ),
+  };
+});
+
 function renderWithRouter(component: React.ReactElement) {
   return render(<BrowserRouter>{component}</BrowserRouter>);
 }
@@ -82,7 +92,7 @@ describe('DashboardPage', () => {
     sessionStorage.setItem('carbonResult', JSON.stringify(mockResult));
     renderWithRouter(<DashboardPage />);
 
-    expect(screen.getByRole('heading', { name: /emission dashboard/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /eco warrior/i })).toBeInTheDocument();
     expect(screen.getByText('6.0')).toBeInTheDocument();
     expect(screen.getByText('500')).toBeInTheDocument();
   });

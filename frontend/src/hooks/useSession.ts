@@ -3,7 +3,7 @@
  * Generates and persists a unique session ID for anonymous progress tracking.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const SESSION_KEY = 'carbonwise_session_id';
 
@@ -12,16 +12,14 @@ function generateSessionId(): string {
 }
 
 export function useSession() {
-  const [sessionId, setSessionId] = useState<string>('');
-
-  useEffect(() => {
+  const [sessionId] = useState<string>(() => {
     let id = localStorage.getItem(SESSION_KEY);
     if (!id) {
       id = generateSessionId();
       localStorage.setItem(SESSION_KEY, id);
     }
-    setSessionId(id);
-  }, []);
+    return id;
+  });
 
   return sessionId;
 }

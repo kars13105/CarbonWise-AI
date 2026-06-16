@@ -53,7 +53,10 @@ export function useProgress(sessionId: string): UseProgressReturn {
 
   useEffect(() => {
     if (sessionId) {
-      refresh();
+      const timer = setTimeout(() => {
+        refresh();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [sessionId, refresh]);
 

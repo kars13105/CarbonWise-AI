@@ -3,7 +3,7 @@
  * Playful loading states, pastel design, DOMPurify-secured markdown output.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import DOMPurify from 'dompurify';
@@ -12,24 +12,25 @@ import type { CarbonResult } from '../types/carbon';
 import { EcoMascot } from '../components/EcoIllustrations';
 
 export default function CoachPage() {
-  const [result, setResult] = useState<CarbonResult | null>(null);
-  const [inputData, setInputData] = useState<{ food_type: string; shopping_level: string } | null>(null);
-  const { plan, loading, error, generate, reset } = useAICoach();
-
-  useEffect(() => {
+  const [result] = useState<CarbonResult | null>(() => {
     const stored = sessionStorage.getItem('carbonResult');
-    const storedInput = sessionStorage.getItem('carbonInput');
     if (stored) {
       try {
-        setResult(JSON.parse(stored));
+        return JSON.parse(stored);
       } catch { /* ignore */ }
     }
+    return null;
+  });
+  const [inputData] = useState<{ food_type: string; shopping_level: string } | null>(() => {
+    const storedInput = sessionStorage.getItem('carbonInput');
     if (storedInput) {
       try {
-        setInputData(JSON.parse(storedInput));
+        return JSON.parse(storedInput);
       } catch { /* ignore */ }
     }
-  }, []);
+    return null;
+  });
+  const { plan, loading, error, generate, reset } = useAICoach();
 
   const handleGenerate = () => {
     if (!result) return;
@@ -149,11 +150,11 @@ export default function CoachPage() {
               </div>
             </div>
             <div className="space-y-3">
-              {[...Array(6)].map((_, i) => (
+              {['85%', '92%', '75%', '88%', '70%', '80%'].map((width, i) => (
                 <div
                   key={i}
                   className="skeleton h-4"
-                  style={{ width: `${70 + Math.random() * 30}%` }}
+                  style={{ width }}
                 />
               ))}
             </div>

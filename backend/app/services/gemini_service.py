@@ -13,9 +13,9 @@ import google.generativeai as genai
 
 
 # Model configuration
-GEMINI_MODEL = "gemini-flash-latest"
-MAX_OUTPUT_TOKENS = 2048
-TEMPERATURE = 0.7
+GEMINI_MODEL = "gemini-1.5-pro"
+MAX_OUTPUT_TOKENS = 4096
+TEMPERATURE = 0.5
 
 
 def _get_client():
