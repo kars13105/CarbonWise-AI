@@ -108,7 +108,7 @@ export default function HomePage() {
               className="btn-primary text-lg px-8 py-4 no-underline"
               id="hero-cta-primary"
             >
-              🧮 Calculate My Footprint
+              Calculate My Footprint
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </Link>
             <Link
@@ -116,7 +116,7 @@ export default function HomePage() {
               className="btn-secondary text-lg px-8 py-4 no-underline"
               id="hero-cta-secondary"
             >
-              💚 Learn More
+              Learn More
             </Link>
           </div>
 
@@ -149,7 +149,7 @@ export default function HomePage() {
             className="text-3xl md:text-4xl font-black text-forest-900 mb-4"
           >
             Everything You Need to
-            <span className="gradient-text"> Go Green</span> 🌿
+            <span className="gradient-text"> Go Green</span>
           </h2>
           <p className="text-text-500 text-lg max-w-xl mx-auto font-medium">
             A comprehensive, fun toolkit to measure and reduce your environmental impact.
@@ -190,7 +190,7 @@ export default function HomePage() {
             id="how-heading"
             className="text-3xl md:text-4xl font-black text-forest-900 mb-4"
           >
-            How It Works 🚀
+            How It Works
           </h2>
         </div>
 
@@ -244,7 +244,7 @@ export default function HomePage() {
               <TreeGrowth score={85} size={120} />
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-forest-900 mb-4">
-              Ready to Grow Your Eco Tree? 🌿
+              Ready to Grow Your Eco Tree?
             </h2>
             <p className="text-text-500 text-lg mb-8 max-w-xl mx-auto font-medium">
               Start your sustainability journey today. It takes less than 2 minutes
@@ -255,7 +255,7 @@ export default function HomePage() {
               className="btn-primary text-lg px-8 py-4 no-underline"
               id="bottom-cta"
             >
-              🌱 Get Started Now
+              Get Started Now
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </Link>
           </div>
