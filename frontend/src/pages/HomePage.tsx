@@ -60,9 +60,9 @@ const FEATURES = [
 ];
 
 const IMPACT_STATS = [
-  { value: 4.7, suffix: 't', label: 'Global Avg CO₂/year', emoji: '🌍' },
-  { value: 5, suffix: '+', label: 'Emission Categories', emoji: '📋' },
-  { value: 100, suffix: '%', label: 'Free & Open Source', emoji: '💚' },
+  { value: 4.7, suffix: 't', label: 'Global Avg CO₂/year' },
+  { value: 5, suffix: '+', label: 'Emission Categories' },
+  { value: 100, suffix: '%', label: 'Free & Open Source' },
 ];
 
 export default function HomePage() {
@@ -125,7 +125,7 @@ export default function HomePage() {
             {IMPACT_STATS.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
-                  <span className="text-2xl" aria-hidden="true">{stat.emoji}</span>
+                  <span className="text-2xl" aria-hidden="true"></span>
                   <span className="text-2xl md:text-3xl font-black text-forest-800">
                     <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                   </span>
