@@ -88,8 +88,16 @@ class ReductionGoalDB(Base):
 
 
 def init_db():
-    """Create all database tables."""
-    Base.metadata.create_all(bind=engine)
+    """Create all database tables.
+
+    Wrapped in try/except to handle race conditions when multiple
+    gunicorn workers call this simultaneously on startup.
+    """
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception:
+        # Tables already exist (race condition with multiple workers)
+        pass
 
 
 def get_db():
