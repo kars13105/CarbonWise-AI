@@ -1,5 +1,10 @@
 """
-Google Gemini AI service for sustainability coaching.
+AI service for sustainability coaching.
+
+Supports both xAI Grok and Google Gemini as AI providers.
+Auto-detects provider based on available API keys:
+  - XAI_API_KEY  → uses Grok (xAI's OpenAI-compatible API)
+  - GEMINI_API_KEY → uses Google Gemini
 
 Constructs structured prompts from user footprint data and returns
 personalized sustainability plans.
@@ -8,26 +13,27 @@ personalized sustainability plans.
 import os
 from datetime import datetime, timezone
 import asyncio
+import logging
 
-import google.generativeai as genai
-
+logger = logging.getLogger(__name__)
 
 # Model configuration
-GEMINI_MODEL = "gemini-1.5-pro"
+GROK_MODEL = "grok-3-mini-fast"
+GEMINI_MODEL = "gemini-2.5-flash"
 MAX_OUTPUT_TOKENS = 4096
 TEMPERATURE = 0.5
 
 
-def _get_client():
-    """Initialize and return the Gemini client."""
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError(
-            "GEMINI_API_KEY environment variable is not set. "
-            "Please add it to your .env file."
-        )
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel(GEMINI_MODEL)
+def _get_provider() -> str:
+    """Determine which AI provider to use based on available API keys."""
+    if os.getenv("XAI_API_KEY"):
+        return "grok"
+    if os.getenv("GEMINI_API_KEY"):
+        return "gemini"
+    raise ValueError(
+        "No AI API key configured. Set either XAI_API_KEY (for Grok) "
+        "or GEMINI_API_KEY (for Gemini) in your environment variables."
+    )
 
 
 def _build_prompt(
@@ -38,7 +44,7 @@ def _build_prompt(
     shopping_level: str,
 ) -> str:
     """
-    Build a structured prompt for the Gemini AI model.
+    Build a structured prompt for the AI model.
 
     Args:
         total_annual_emissions: Total annual CO2 in tonnes
@@ -90,6 +96,52 @@ Focus on the user's highest emission categories for maximum impact.
 """
 
 
+async def _generate_with_grok(prompt: str) -> str:
+    """Generate text using xAI Grok (OpenAI-compatible API)."""
+    from openai import OpenAI
+
+    client = OpenAI(
+        api_key=os.getenv("XAI_API_KEY"),
+        base_url="https://api.x.ai/v1",
+    )
+
+    response = await asyncio.to_thread(
+        client.chat.completions.create,
+        model=GROK_MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": "You are an expert sustainability coach. Provide helpful, actionable, and encouraging advice.",
+            },
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=MAX_OUTPUT_TOKENS,
+        temperature=TEMPERATURE,
+    )
+
+    return response.choices[0].message.content
+
+
+async def _generate_with_gemini(prompt: str) -> str:
+    """Generate text using Google Gemini."""
+    import google.generativeai as genai
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel(GEMINI_MODEL)
+
+    response = await asyncio.to_thread(
+        model.generate_content,
+        prompt,
+        generation_config=genai.types.GenerationConfig(
+            max_output_tokens=MAX_OUTPUT_TOKENS,
+            temperature=TEMPERATURE,
+        ),
+    )
+
+    return response.text
+
+
 async def generate_sustainability_plan(
     total_annual_emissions: float,
     breakdown: dict,
@@ -98,7 +150,10 @@ async def generate_sustainability_plan(
     shopping_level: str = "medium",
 ) -> dict:
     """
-    Generate a personalized sustainability plan using Gemini AI.
+    Generate a personalized sustainability plan using AI.
+
+    Auto-detects whether to use Grok or Gemini based on
+    available API keys (XAI_API_KEY takes priority).
 
     Args:
         total_annual_emissions: Total annual CO2 in tonnes
@@ -111,26 +166,21 @@ async def generate_sustainability_plan(
         Dictionary with 'plan' text and 'generated_at' timestamp
 
     Raises:
-        ValueError: If API key is not configured
-        Exception: If Gemini API call fails
+        ValueError: If no API key is configured
+        Exception: If AI API call fails
     """
-    model = _get_client()
+    provider = _get_provider()
+    logger.info(f"Using AI provider: {provider}")
 
     prompt = _build_prompt(
         total_annual_emissions, breakdown, carbon_score, food_type, shopping_level
     )
 
     try:
-        response = await asyncio.to_thread(
-            model.generate_content,
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                max_output_tokens=MAX_OUTPUT_TOKENS,
-                temperature=TEMPERATURE,
-            ),
-        )
-
-        plan_text = response.text
+        if provider == "grok":
+            plan_text = await _generate_with_grok(prompt)
+        else:
+            plan_text = await _generate_with_gemini(prompt)
 
         return {
             "plan": plan_text,
@@ -138,4 +188,4 @@ async def generate_sustainability_plan(
         }
 
     except Exception as e:
-        raise Exception(f"Failed to generate sustainability plan: {str(e)}")
+        raise Exception(f"Failed to generate sustainability plan ({provider}): {str(e)}")

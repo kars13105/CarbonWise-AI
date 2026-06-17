@@ -4,4 +4,5 @@ python-dotenv==1.1.0
 sqlalchemy==2.0.36
 pydantic==2.10.4
 google-generativeai==0.8.4
+openai>=1.30.0
 gunicorn==23.0.0
