@@ -1,9 +1,9 @@
 """
 AI service for sustainability coaching.
 
-Supports both xAI Grok and Google Gemini as AI providers.
-Auto-detects provider based on available API keys:
-  - XAI_API_KEY  → uses Grok (xAI's OpenAI-compatible API)
+Supports multiple AI providers, auto-detected via environment variables:
+  - GROQ_API_KEY  → uses Groq (free, fast inference for open-source models)
+  - XAI_API_KEY   → uses Grok (xAI's OpenAI-compatible API)
   - GEMINI_API_KEY → uses Google Gemini
 
 Constructs structured prompts from user footprint data and returns
@@ -17,7 +17,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Model configuration
+# Model configuration per provider
+GROQ_MODEL = "llama-3.3-70b-versatile"
 GROK_MODEL = "grok-3-mini-fast"
 GEMINI_MODEL = "gemini-2.5-flash"
 MAX_OUTPUT_TOKENS = 4096
@@ -25,14 +26,19 @@ TEMPERATURE = 0.5
 
 
 def _get_provider() -> str:
-    """Determine which AI provider to use based on available API keys."""
+    """Determine which AI provider to use based on available API keys.
+
+    Priority: Groq (free & fast) > Grok (xAI) > Gemini (Google)
+    """
+    if os.getenv("GROQ_API_KEY"):
+        return "groq"
     if os.getenv("XAI_API_KEY"):
         return "grok"
     if os.getenv("GEMINI_API_KEY"):
         return "gemini"
     raise ValueError(
-        "No AI API key configured. Set either XAI_API_KEY (for Grok) "
-        "or GEMINI_API_KEY (for Gemini) in your environment variables."
+        "No AI API key configured. Set one of: GROQ_API_KEY, "
+        "XAI_API_KEY, or GEMINI_API_KEY in your environment variables."
     )
 
 
@@ -96,18 +102,20 @@ Focus on the user's highest emission categories for maximum impact.
 """
 
 
-async def _generate_with_grok(prompt: str) -> str:
-    """Generate text using xAI Grok (OpenAI-compatible API)."""
+async def _generate_with_openai_compatible(
+    prompt: str, api_key: str, base_url: str, model: str
+) -> str:
+    """Generate text using any OpenAI-compatible API (Groq, Grok, etc.)."""
     from openai import OpenAI
 
     client = OpenAI(
-        api_key=os.getenv("XAI_API_KEY"),
-        base_url="https://api.x.ai/v1",
+        api_key=api_key,
+        base_url=base_url,
     )
 
     response = await asyncio.to_thread(
         client.chat.completions.create,
-        model=GROK_MODEL,
+        model=model,
         messages=[
             {
                 "role": "system",
@@ -152,8 +160,8 @@ async def generate_sustainability_plan(
     """
     Generate a personalized sustainability plan using AI.
 
-    Auto-detects whether to use Grok or Gemini based on
-    available API keys (XAI_API_KEY takes priority).
+    Auto-detects provider based on available API keys.
+    Priority: Groq > Grok > Gemini.
 
     Args:
         total_annual_emissions: Total annual CO2 in tonnes
@@ -177,8 +185,20 @@ async def generate_sustainability_plan(
     )
 
     try:
-        if provider == "grok":
-            plan_text = await _generate_with_grok(prompt)
+        if provider == "groq":
+            plan_text = await _generate_with_openai_compatible(
+                prompt,
+                api_key=os.getenv("GROQ_API_KEY"),
+                base_url="https://api.groq.com/openai/v1",
+                model=GROQ_MODEL,
+            )
+        elif provider == "grok":
+            plan_text = await _generate_with_openai_compatible(
+                prompt,
+                api_key=os.getenv("XAI_API_KEY"),
+                base_url="https://api.x.ai/v1",
+                model=GROK_MODEL,
+            )
         else:
             plan_text = await _generate_with_gemini(prompt)
 
