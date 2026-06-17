@@ -6,6 +6,7 @@ by changing the DATABASE_URL connection string.
 """
 
 import json
+import os
 from datetime import datetime, timezone
 
 from sqlalchemy import (
@@ -21,9 +22,23 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
-DATABASE_URL = "sqlite:///./carbonwise.db"
+def _get_database_url() -> str:
+    """Get database URL from environment or use a sensible default."""
+    url = os.getenv("DATABASE_URL")
+    if url:
+        return url
+    # On Render (or any deployment), use /tmp which is always writable
+    if os.getenv("RENDER"):
+        return "sqlite:////tmp/carbonwise.db"
+    # Local development
+    return "sqlite:///./carbonwise.db"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+DATABASE_URL = _get_database_url()
+
+# check_same_thread is only needed for SQLite
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
